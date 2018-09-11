@@ -1,2 +1,2 @@
-# webpack-babel-es6-template
-simple template for Webpack, Babel, ES6
+# Room Wars html5 3d game
+
