@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Webpack Babel ES6</title>
+
+    <!-- Allow fullscreen mode on iOS devices. (These are Apple specific meta tags.) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="HandheldFriendly" content="true" />
+
+    <!-- Chrome for Android web app tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- All margins and padding must be zero for the canvas to fill the screen. -->
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        html, body {
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            touch-action: none;
+            -ms-touch-action: none;
+        }
+        canvas {
+            touch-action: none;
+            -ms-touch-action: none;
+        }
+    </style>
+
+    <!-- Link to the last version of BabylonJS loaders to enable loading filetypes such as .gltf -->
+    <!--<script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>-->
+    <!-- Link to pep.js to ensure pointer events work consistently in all browsers -->
+    <!--<script src="https://code.jquery.com/pep/0.4.1/pep.js"></script>-->
+
+    <script src=""></script>
+</head>
+
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <script src="bundle.js"></script>
+</body>
+
+</html>
