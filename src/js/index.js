@@ -41,7 +41,7 @@ const createScene = function(){
 
         const meshes = scene.meshes;
         for (let m=0; m < meshes.length; m++) {
-            console.log(11, meshes[m].name);
+            // console.log(11, meshes[m].name);
 
             if (meshes[m].name === 'room') {
                 let children = meshes[m].getChildren();
