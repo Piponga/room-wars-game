@@ -69,9 +69,9 @@ function canvasResize() {
 }
 
 function detectmob() {
-    BABYLON.isOnMobile = false;
+    Game.isOnMobile = false;
 
-    BABYLON.isOnMobile = !!(navigator.userAgent.match(/Android/i)
+    Game.isOnMobile = !!(navigator.userAgent.match(/Android/i)
     || navigator.userAgent.match(/webOS/i)
     || navigator.userAgent.match(/iPhone/i)
     || navigator.userAgent.match(/iPad/i)
@@ -80,15 +80,15 @@ function detectmob() {
     || navigator.userAgent.match(/Windows Phone/i));
 }
 
-window.addEventListener('blur',function(){
-    engine.stopRenderLoop();
-    // _ANIMATABLE.pause();
-    console.log('paused');
-});
-window.addEventListener('focus',function(){
-    engine.runRenderLoop(function () {
-    // _ANIMATABLE.restart();
-        scene.render();
-    });
-    console.log('resumed')
-});
+// window.addEventListener('blur',function(){
+//     engine.stopRenderLoop();
+//     // _ANIMATABLE.pause();
+//     console.log('paused');
+// });
+// window.addEventListener('focus',function(){
+//     engine.runRenderLoop(function () {
+//     // _ANIMATABLE.restart();
+//         scene.render();
+//     });
+//     console.log('resumed')
+// });

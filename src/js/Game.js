@@ -132,8 +132,10 @@ export default function Game(engine) {
             hero.isShooting = false;
         }));
 
-
         scene.onBeforeRenderObservable.add(() => {
+            if (Game.isOnMobile) {
+                Game.inputMap[87] = true;
+            }
             if (Game.inputMap[87] || Game.inputMap[38]) {              // 87 - w, 38 - up arrow
                 hero.heroDirection.z = hero.speed;
                 hero.isMoving = true;
