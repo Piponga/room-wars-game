@@ -11,10 +11,10 @@ export const config = {
     weapons: {
         newbie: {
             bulletType: 'green-small',
-            bulletSpeed: 80,
+            bulletSpeed: 60 ,
             bulletPower: 20,
-            shotDelay: 200,
-            shotDistance: 2000
+            shotDelay: 250,
+            shotDistance: 3000
         }
     }
 };

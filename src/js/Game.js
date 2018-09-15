@@ -54,7 +54,7 @@ export default function Game(engine) {
         Game.spawnContainer.setEnabled(false);
 
         // create HERO --------------------------------------------------------------------------------------
-        const hero = Game.spawnNewPlayer('hero', 1);
+        const hero = Game.spawnNewPlayer('hero', undefined);
         camera.parent = hero;
         // --------------------------------------------------------------------------------------------------
 
@@ -119,6 +119,10 @@ export default function Game(engine) {
         scene.actionManager = new BABYLON.ActionManager(scene);
         scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
             Game.inputMap[evt.sourceEvent.keyCode] = evt.sourceEvent.type === "keydown";
+            // console.log(evt.sourceEvent.keyCode)
+            // if (evt.sourceEvent.keyCode === 81) {
+            //     scene.getMeshByName('bot1').onDeath();
+            // }
         }));
         scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {
             Game.inputMap[evt.sourceEvent.keyCode] = evt.sourceEvent.type === "keydown";
@@ -135,14 +139,10 @@ export default function Game(engine) {
                 hero.isMoving = true;
             }
             if (Game.inputMap[32]) {                                    // 32 - space
-                if (Game.shotTimer === null) {
-                    Game.shotBullets(hero);
-                    Game.shotTimer = setTimeout(() => {
-                        Game.shotBullets(hero);
-                        Game.shotTimer = null;
-                    }, hero.shotDelay)
-                }
+                hero.isShooting = true;
             }
+
+            let time = Date.now();
 
             // ships ----------------------------------
             for (let i = 0; i < Game.shipStream.length; i++) {
@@ -151,13 +151,12 @@ export default function Game(engine) {
                     continue;
                 }
 
-                if (ship.isBot) {
+                if (ship.isBot && ship.isMoving) {
                     // animate ship along spline
-                    let time = Date.now();
-                    let looptime = (spline.getLength() / (ship.speed * 60)) * 1000;
-                    let t = ( time % looptime ) / looptime;
+                    if (!ship.looptime) ship.looptime = (spline.getLength() / (ship.speed * 60)) * 1000;
+                    let t = ( (time + ship.startBotTime) % ship.looptime ) / ship.looptime;
 
-                    ship.position = spline.getPoint(t);;
+                    ship.position = spline.getPoint(t);
                     let lookAt = spline.getPoint( ( t - 10 / spline.getLength() ) % 1 );
                     ship.lookAt(lookAt);
                 }
@@ -180,12 +179,10 @@ export default function Game(engine) {
                         ship.heroDirection.z = 0;
                     }
 
-
                     // ship.heroDirection.scaleInPlace(ship.inertia);
                     if (!ship.isMoving) {
                         ship.heroDirection.z *= ship.inertia;
                     }
-
                 }
 
                 if (needToRotate) {
@@ -208,6 +205,14 @@ export default function Game(engine) {
                         ship.heroRotation.y = 0;
                     }
                     ship.heroRotation.scaleInPlace(ship.inertia);
+                }
+
+                if (ship.isShooting) {                                    // 32 - space
+                    let diff = time - ship.startShootTime;
+                    if (diff > ship.shotDelay) {
+                        Game.shotBullets(ship);
+                        ship.startShootTime = time;
+                    }
                 }
             }
 
@@ -240,10 +245,18 @@ export default function Game(engine) {
                 let hit = Game.scene.pickWithRay(ray, null);
 
                 if (hit.pickedMesh){
-                    console.log(444, hit.pickedMesh.name);
+                    // console.log(444, hit.pickedMesh);
+
+                    // bullets hit ship collider, NOT a ship. We must take parent of collider and this will be ship
+                    //!!! 'shipId' has only ship.heroCollider.shipId = ship.name
+                    if (hit.pickedMesh.hasOwnProperty('shipId')) {
+                        let ship = hit.pickedMesh.parent;
+                        ship.onDemaged(bullet.parentShip.name, bullet.bulletPower);         // you got damage from someone
+                        bullet.parentShip.onHitOpponent(ship.name, bullet.bulletPower);     // you hit someone
+                    }
+
                     bullet.active = false;
                     bullet.setEnabled(false);
-
                     // hit.pickedMesh
                     // hit.pickedPoint
                     continue;
@@ -285,13 +298,13 @@ export default function Game(engine) {
 Game.shotBullets = function (ship) {
     let r = ship.rotation;
 
-    Game.createBullet(ship.name, ship.trunkLeft.absolutePosition, {x: r.x, y: r.y+ship.shotDevistionRad, z: r.z}, ship.trunkLeft, ship.weaponType, ship.bulletSpeed, ship.bulletPower, ship.shotDistance);
-    Game.createBullet(ship.name, ship.trunkRight.absolutePosition, {x: r.x, y: r.y-ship.shotDevistionRad, z: r.z}, ship.trunkRight, ship.weaponType, ship.bulletSpeed, ship.bulletPower, ship.shotDistance);
+    Game.createBullet(ship, ship.trunkLeft.absolutePosition, {x: r.x, y: r.y+ship.shotDevistionRad, z: r.z}, ship.trunkLeft, ship.weaponType, ship.bulletSpeed, ship.bulletPower, ship.shotDistance);
+    Game.createBullet(ship, ship.trunkRight.absolutePosition, {x: r.x, y: r.y-ship.shotDevistionRad, z: r.z}, ship.trunkRight, ship.weaponType, ship.bulletSpeed, ship.bulletPower, ship.shotDistance);
 };
 
-Game.createBullet = function (shipIdStr, position, rotation, trunk, type, speed, power, shotDistance) {
+Game.createBullet = function (ship, position, rotation, trunk, type, speed, power, shotDistance) {
     let bullet = Game.bulletStream[Game.getBullet()];	// take bullet from pool
-    bullet.parentShip = shipIdStr;
+    bullet.parentShip = ship;
     bullet.bulletSpeed = speed;
     bullet.bulletPower = power;
     bullet.trunkWorldMatrix = trunk.getWorldMatrix().clone();
@@ -310,7 +323,6 @@ Game.createBullet = function (shipIdStr, position, rotation, trunk, type, speed,
     bullet.setEnabled(true);
     // bullet.visibility = 0.1;
 };
-
 Game.getBullet = function() {
     let i = 0;
     let len = Game.bulletStream.length;
@@ -346,6 +358,7 @@ Game.getBullet = function() {
 
     return i;
 };
+
 
 Game.spawnNewBot = function (botIdStr, startBotPoint) {
     let movePointsArr = Game.movePath01.getChildren();
@@ -392,6 +405,7 @@ Game.createShip = function (shipIdStr, position, rotation, paramsObj) {
     ship.heroRotation = new BABYLON.Vector2(0, 0);
     ship.isMoving = false;
     ship.isShooting = false;
+    ship.startShootTime = 0;
     if (ship.name === 'hero') ship.ellipsoid = new BABYLON.Vector3(72, 50, 52.5);
     ship.active = true;
     ship.setEnabled(true);
@@ -407,7 +421,7 @@ Game.createShip = function (shipIdStr, position, rotation, paramsObj) {
 
     ship.shipType = shipType;
     ship.speed = config.ships[ship.shipType].speed;
-    ship.helthPoints = config.ships[ship.shipType].hp;
+    ship.healthPoints = config.ships[ship.shipType].hp;
     ship.rotateSpeed = config.ships[ship.shipType].rotateSpeed;
     ship.angularSensibility = config.ships[ship.shipType].angularSensibility;
     ship.inertia = config.ships[ship.shipType].inertia;
@@ -416,16 +430,56 @@ Game.createShip = function (shipIdStr, position, rotation, paramsObj) {
     ship.bulletSpeed = config.weapons[ship.weaponType].bulletSpeed;
     ship.bulletPower = config.weapons[ship.weaponType].bulletPower;
     ship.shotDelay = config.weapons[ship.weaponType].shotDelay;
+    ship.shotDistance = config.weapons[ship.weaponType].shotDistance;
+    ship.shotDevistionRad = Math.atan(ship.trunkRight.position.x / ship.shotDistance);
+    ship.shotTimer = null;
 
     ship.isBot = isBot;
     ship.startBotPoint = startBotPoint;
+    ship.startBotTime = Rnd.integer(16000);
     if (ship.isBot) ship.heroDirection.z = ship.speed*0.25;
-    if (ship.isBot) ship.isMoving = false;
+    if (ship.isBot) ship.isMoving = true;
+    if (ship.isBot) ship.isShooting = true;
 
     ship.onCollide = function (e) {
         // console.log(6666, e);
     };
+    ship.onHitOpponent = function (opponentId, demage) {
+        if (this.name === 'hero') {
+            console.log('+ вы нанесли ' + opponentId + '  ' + demage + ' урона');
+        }
+    };
+    ship.onDemaged = function (whoDemaged, demage) {
+        this.healthPoints -= demage;
 
+        if (this.name === 'hero') {
+            console.log('----- ' + whoDemaged + ' нанёс вам урон ' + demage);
+        }
+
+        if (this.healthPoints <= 0) {
+            if (this.name === 'hero') {
+                console.log('------------------------ вы убиты ');
+                this.healthPoints = config.ships[this.shipType].hp;
+                return;
+            }
+
+            this.onDeath();
+        }
+    };
+    ship.onDeath = function () {
+        this.isShooting = false;
+        this.isMoving = false;
+        this.active = false;
+        this.setEnabled(false);
+
+        console.log('******* ' + this.name + ' убит *******');
+
+        if (this.isBot) {
+            setTimeout(() => {
+                Game.spawnNewBot('bot1', 15);
+            }, 1000);
+        }
+    };
 
     return ship;
 };

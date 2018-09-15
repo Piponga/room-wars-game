@@ -20,7 +20,7 @@ meshTask1.onError = function (task, message, exception) {
     console.log(message, exception);
 };
 
-const meshTask2 = assetsManager.addMeshTask("ship01", "", "assets/", "ship01.babylon")
+const meshTask2 = assetsManager.addMeshTask("ship01", "", "assets/", "ship01.babylon");
 meshTask2.onSuccess = function (task) {
     task.loadedMeshes[0].setEnabled(false);
 };
