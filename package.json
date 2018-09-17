@@ -6,18 +6,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "dev": "webpack-dev-server --content-base public --hot"
+    "dev": "webpack-dev-server --content-base public --hot --host 0.0.0.0"
   },
   "author": "piponga",
   "license": "ISC",
   "dependencies": {
     "babylonjs": "^3.2.0",
-    "babylonjs-loaders": "^3.2.0"
+    "babylonjs-gui": "^3.2.0",
+    "babylonjs-loaders": "^3.2.0",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-minify-webpack-plugin": "^0.3.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "css-loader": "^0.28.9",
     "extract-text-webpack-plugin": "^3.0.2",
