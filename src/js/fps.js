@@ -18,7 +18,7 @@ export default BABYLON.Scene.prototype.showFps = function(args){
     n.setAttribute('id', 'fps-block');
     n.setAttribute('style',
         'position:absolute;'+
-        'top: 20px;' +
+        'top: 10px;' +
         'left: 10px;' +
         'display:block;'+
         'z-index:10001;'+
@@ -36,10 +36,12 @@ export default BABYLON.Scene.prototype.showFps = function(args){
 
     let self = this;
     let pE = self._engine;
+
     function getFps() {
+        let meshesCount = self.hasOwnProperty('meshes') ? self.meshes.length : '-';
         let b = document.getElementById('fps-block');
         if (b) {
-            b.innerHTML = pE.getFps().toFixed() + " fps";
+            b.innerHTML = pE.getFps().toFixed() + " fps" + ' objCount:' + meshesCount;
             setTimeout(function () { getFps() }, 1000 / ioSpeed);
         }
     }

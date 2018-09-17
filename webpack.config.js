@@ -1,23 +1,32 @@
+const webpack = require("webpack");
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const MinifyPlugin = require("babel-minify-webpack-plugin");
 
 const env = process.env.NODE_ENV || 'development';
-const isDev = env === 'development';
-const isProd = env === 'production';
+const DEVELOPMENT = env === 'development';
+const PRODUCTION = env === 'production';
+
 
 const extractCss = new ExtractTextPlugin({
     filename: 'index.css',
-    disable: isDev
+    disable: DEVELOPMENT
 });
 
 const babelMinify = new MinifyPlugin({
 });
 
 let pluginsArr = [
-    extractCss
+    extractCss,
+    // if process.env.NODE_ENV = 'development' in any .js file:
+    // console.log(PRODUCTION); // prints false
+    // console.log(DEVELOPMENT); // prints true
+    new webpack.DefinePlugin({
+        PRODUCTION: PRODUCTION,
+        DEVELOPMENT: DEVELOPMENT
+    })
 ];
-if (isProd) pluginsArr.push(babelMinify);
+// if (PRODUCTION) pluginsArr.push(babelMinify);
 
 module.exports = {
     entry: {

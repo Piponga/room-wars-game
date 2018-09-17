@@ -2,16 +2,19 @@ import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import './fps';
 import Game from './Game';
+import {socket} from './socket';
 
 
 const canvas = document.getElementById('renderCanvas');
 const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true});
 canvasResize();
 const scene = new BABYLON.Scene(engine);
-
+engine.enableOfflineSupport = false;
+// engine.setHardwareScalingLevel(2);
 
 
 const assetsManager = new BABYLON.AssetsManager(scene);
+assetsManager.isCompleted = false;
 
 const meshTask1 = assetsManager.addMeshTask("room1", "", "assets/", "room1.babylon");
 meshTask1.onSuccess = function (task) {
@@ -44,13 +47,31 @@ meshTask4.onError = function (task, message, exception) {
     console.log(message, exception);
 };
 
+// const meshTask5 = assetsManager.addTextureTask("redShading", "assets/red_shading.png", false);
+// meshTask5.onSuccess = function (task) {
+//
+// };
+// meshTask5.onError = function (task, message, exception) {
+//     console.log(message, exception);
+// };
+
 assetsManager.load();
 
 assetsManager.onFinish = function(tasks) {
+    assetsManager.isCompleted = true;
+    if (!socket.isMyConnected) return;
 
     Game(engine);
 };
 
+
+socket.on('room-wars-connect', function (username) {
+    socket.isMyConnected = true;
+    socket.username = username;
+    if (assetsManager.isCompleted) {
+        Game(engine);
+    }
+});
 
 
 
