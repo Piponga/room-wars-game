@@ -1,7 +1,7 @@
 import Rnd from './lib/Rnd';
 import { Vector3, TouchCamera} from 'babylonjs';
 import {config} from './config';
-import './fps';
+import './lib/fps';
 
 export default class Menu {
     constructor(app) {

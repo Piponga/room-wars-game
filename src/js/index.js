@@ -19,18 +19,6 @@ class App {
         window.addEventListener('resize', () => {
             this.canvasResize();
         });
-
-        this.boot();
-    }
-
-    boot() {
-        // this.game.runRenderLoop(() => {
-        //     this.update();
-        // });
-    }
-
-    update() {
-        // this.state.update();
     }
 
     canvasResize() {
