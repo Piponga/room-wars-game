@@ -163,10 +163,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class App {
     constructor() {
         this.canvas = document.getElementById('renderCanvas');
-        this.game = new _babylonjs.Engine(this.canvas, false, { preserveDrawingBuffer: true, stencil: true });
+        this.engine = new _babylonjs.Engine(this.canvas, false, { preserveDrawingBuffer: true, stencil: true });
 
-        this.scene = new _babylonjs.Scene(this.game);
-        this.game.enableOfflineSupport = false;
+        this.scene = new _babylonjs.Scene(this.engine);
+        this.engine.enableOfflineSupport = false;
 
         this.state = new _StateManager2.default(this);
 
@@ -179,7 +179,7 @@ class App {
     }
 
     boot() {
-        // this.game.runRenderLoop(() => {
+        // this.engine.runRenderLoop(() => {
         //     this.update();
         // });
     }
@@ -192,7 +192,7 @@ class App {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
 
-        this.game.resize();
+        this.engine.resize();
     }
 }
 
@@ -387,7 +387,7 @@ class Menu {
 
         scene.showFps();
 
-        this.app.game.runRenderLoop(() => {
+        this.app.engine.runRenderLoop(() => {
             this.update();
         });
     }

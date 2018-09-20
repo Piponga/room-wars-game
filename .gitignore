@@ -2,7 +2,4 @@
 package-lock.json
 node_modules
 content
-tmp.js
-tmp2.js
-tmp3.js
-tmp4.js
+src/js/tmp/
