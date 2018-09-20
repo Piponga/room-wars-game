@@ -1,7 +1,7 @@
 import { Engine, Scene} from 'babylonjs';
 import StateManager from './StateManager';
 import Preload from './Preload';
-import Menu from './Game';
+import {Game} from './Game';
 
 
 class App {
@@ -28,15 +28,12 @@ class App {
     }
 }
 
-export default App;
-
-
 
 const app = new App();
 
 
 app.state.add('Preload', Preload);
-app.state.add('Menu', Menu);
+app.state.add('Game', Game);
 
 app.state.start('Preload');
 

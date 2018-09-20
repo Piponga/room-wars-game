@@ -3,7 +3,7 @@ import { Vector3, TouchCamera} from 'babylonjs';
 import {config} from './config';
 import './lib/fps';
 
-export default class Menu {
+export class Game {
     constructor(app) {
         this.app = app;
 
@@ -23,7 +23,7 @@ export default class Menu {
         const spawnContainer = scene.getMeshByName('spawn_container');
         spawnContainer.setEnabled(false);
 
-        let spawnPoint = Menu.ChooseSpawnPoint(spawnContainer, 1);
+        let spawnPoint = Game.ChooseSpawnPoint(spawnContainer, 1);
         touchCamera.position = spawnPoint.absolutePosition;
         touchCamera.rotation = spawnPoint.rotationQuaternion.toEulerAngles();
 

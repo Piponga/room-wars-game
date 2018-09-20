@@ -20,7 +20,7 @@ export default class Preload {
         assetsManager.load();
 
         assetsManager.onFinish = (tasks) => {
-            this.app.state.start('Menu');
+            this.app.state.start('Game');
         };
 
     }
