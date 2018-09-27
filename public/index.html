@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>Webpack Babel ES6</title>
+    <title>Room Wars 3D</title>
 
     <!-- Allow fullscreen mode on iOS devices. (These are Apple specific meta tags.) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
@@ -16,18 +16,8 @@
     <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- All margins and padding must be zero for the canvas to fill the screen. -->
+    <link rel="stylesheet" href="css/style.css" />
     <style type="text/css">
-        * {
-            padding: 0;
-            margin: 0;
-        }
-        html, body {
-            background: #000;
-            color: #fff;
-            overflow: hidden;
-            touch-action: none;
-            -ms-touch-action: none;
-        }
         canvas {
             width: 100%;
             touch-action: none;
@@ -45,9 +35,54 @@
 </head>
 
 <body>
-    <canvas id="renderCanvas"></canvas>
+    <div class="login-shade">
+        <div class="login-cont-table">
+            <div class="login-cont-cell">
+                <div class="login-cont">
+                    <!--<h1>Регистрация и вход</h1>-->
+                    <!--<p>Введите имя пользователя и пароль. Если такого пользователя нет - он будет создан.</p><br>-->
+                    <!--<form class="login-form" name="login-form">-->
+                        <!--<div class="form-group"><label class="col-lg-2 control-label" for="input-username">Имя</label>-->
+                            <!--<div class="col-lg-10"><input class="form-control" id="input-username" name="username" value=""-->
+                                                          <!--type="text" placeholder="Имя"></div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group"><label class="col-lg-2 control-label" for="input-password">Пароль</label>-->
+                            <!--<div class="col-lg-10"><input class="form-control" id="input-password" name="password" value=""-->
+                                                          <!--type="password" placeholder="Пароль"></div>-->
+                        <!--</div>-->
+                        <!--<br>-->
+                        <!--<div class="form-group">-->
+                            <!--<div class="col-lg-offset-2 col-lg-10">-->
+                                <!--<button class="btn btn-primary" type="submit" data-loading-text="Отправляю...">Войти-->
+                                <!--</button>-->
+                                <!--<span class="help-block error"></span></div>-->
+                        <!--</div>-->
+                    <!--</form>-->
+                    <!--<br><br>-->
+                    <form class="login-guest-form" name="login-guest-form" >
+                        <div class="form-group">
+                            <div class="col-lg-10"><input class="form-control" id="input-guest" name="guestname" value=""
+                                                          type="text" placeholder="Name" ></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-offset-2 col-lg-10">
+                                <button class="btn btn-guest-primary" type="submit" data-loading-text="Connecting...">Play
+                                    as guest
+                                </button>
+                                <span class="help-block error"></span></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!--<script src="/socket.io/socket.io.js"></script>-->
+    <script>
+
+
+    </script>
+
+    <canvas id="renderCanvas"></canvas>
     <script src="bundle.js"></script>
 </body>
 

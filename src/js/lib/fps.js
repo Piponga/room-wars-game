@@ -1,4 +1,5 @@
-import * as BABYLON from 'babylonjs';
+// import * as BABYLON from 'babylonjs';
+import BABYLON from '../BABYLON';
 
 export default BABYLON.Scene.prototype.showFps = function(args){
     args = args || {};

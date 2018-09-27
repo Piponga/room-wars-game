@@ -1,11 +1,53 @@
 import Rnd from './lib/Rnd';
-import * as BABYLON from 'babylonjs';
+import BABYLON from './BABYLON';
 import * as GUI from 'babylonjs-gui';
-import './fps';
+
+import './lib/fps';
 import {config} from './config';
 import {CatmullRomCurve3} from './lib/CatmullRomCurve3';
 
 import {socket} from './socket';
+
+
+/*BABYLON.CollisionCoordinatorLegacy.prototype._collideWithWorld = null;
+BABYLON.CollisionCoordinatorLegacy.prototype._collideWithWorld = function (position, velocity, collider, maximumRetry, finalPosition, excludedMesh) {
+    if (excludedMesh === void 0) { excludedMesh = null; }
+    var closeDistance = BABYLON.Engine.CollisionsEpsilon * 10.0;
+    if (collider.retry >= maximumRetry) {
+        finalPosition.copyFrom(position);
+        return;
+    }
+    collider._initialize(position, velocity, closeDistance);
+    // Check all meshes
+    for (var index = 0; index < this._scene.meshes.length; index++) {
+        var mesh = this._scene.meshes[index];
+        if (mesh.isEnabled() && mesh.checkCollisions && mesh.subMeshes && mesh !== excludedMesh && checkCollisionFilters(collider, mesh)) {
+            mesh._checkCollision(collider);
+        }
+    }
+    if (!collider.collisionFound) {
+        position.addToRef(velocity, finalPosition);
+        return;
+    }
+    if (velocity.x !== 0 || velocity.y !== 0 || velocity.z !== 0) {
+        collider._getResponse(position, velocity);
+    }
+    if (velocity.length() <= closeDistance) {
+        finalPosition.copyFrom(position);
+        return;
+    }
+    collider.retry++;
+    this._collideWithWorld(position, velocity, collider, maximumRetry, finalPosition, excludedMesh);
+};
+
+function checkCollisionFilters(collider, mesh){
+    if(!collider.collisionFilter) collider.collisionFilter = 1;
+    if(!mesh.collisionFilter) mesh.collisionFilter = 1;
+    if( !(collider.collisionFilter === 1 && mesh.collisionFilter === 1) && !(collider.collisionFilter > mesh.collisionFilter) )
+        return false;
+    else
+        return true;
+}*/
 
 
 export default function Game(engine) {
@@ -31,8 +73,6 @@ export default function Game(engine) {
         // Game.followCamera.cameraAcceleration = 0.1;
         // Game.followCamera.maxCameraSpeed = 100;
         scene.activeCamera = Game.touchCamera;
-
-        Game.advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
 
         // const roof = BABYLON.Mesh.CreatePlane("ground", 500, scene);
         const roofMat = new BABYLON.StandardMaterial("roofMat", scene);
@@ -84,14 +124,14 @@ export default function Game(engine) {
 
         // create HERO --------------------------------------------------------------------------------------
         let username = socket.username || 'hero';
-        Game.hero = Game.spawnNewPlayer(username, {spawnPointIndex: undefined, isHero: true});
+        Game.hero = Game.spawnNewPlayer(username, {spawnPointIndex: 1, isHero: true});
         Game.camera = scene.activeCamera;
         if (Game.camera === Game.followCamera) {
             Game.camera.lockedTarget = Game.hero;
         } else {
             Game.camera.parent = Game.hero;
         }
-
+console.log('username: ', username)
         let data = {
             user: username,
             pos: Game.hero.position,
@@ -111,8 +151,13 @@ export default function Game(engine) {
         for (let i = 0; i < botCount; i++) {
             // let bot = Game.spawnNewBot('bot' + i, botInterval * i);
             // bot.isMoving = false;
+            // setTimeout(()=>{
+            //     bot.isMoving = false;
+            // }, 100);
+            // bot.isShooting = false;
         }
         // GUI RED ------------------------------------------------------------------------------------------
+        Game.advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
         let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui");
         Game.redShading = new GUI.Image('redShading', '/assets/red_shading.png');
         Game.redShading.alpha = 0.0;
@@ -121,7 +166,6 @@ export default function Game(engine) {
         //---------------------------------------------------------------------------------------------------
         Game.clientJoin = new BABYLON.Sound("clientJoin", "assets/buy_voice1.wav", scene, null, { loop: false, autoplay: false });
         //---------------------------------------------------------------------------------------------------
-
 
         // function YourOptimizer() {
         //     var result = new BABYLON.SceneOptimizerOptions(40, 3000);
@@ -222,6 +266,7 @@ export default function Game(engine) {
                     Game.inputMap[87] = true;
                     Game.inputMap[32] = true;
                 }
+
             }
             if (Game.inputMap[87] || Game.inputMap[38]) {              // 87 - w, 38 - up arrow
                 Game.hero.heroDirection.z = Game.hero.speed;
@@ -336,7 +381,8 @@ export default function Game(engine) {
 
 
             // bullets ----------------------------------
-            for (let i = 0; i < Game.bulletStream.length; i++) {
+            let bulletStreamLength = Game.bulletStream.length;
+            for (let i = 0; i < bulletStreamLength; i++) {
                 let bullet = Game.bulletStream[i];
                 if (!bullet || !bullet.active) {
                     continue;
@@ -358,7 +404,7 @@ export default function Game(engine) {
 
                 let length = bullet.bulletSpeed * dt;
 
-                let ray = new BABYLON.Ray(origin, direction, length);
+                /*               let ray = new BABYLON.Ray(origin, direction, length);
 
                 let hit = Game.scene.pickWithRay(ray, null);
 
@@ -387,10 +433,15 @@ export default function Game(engine) {
                     bullet.curShotDist += bullet.bulletSpeed * dt;
 
                     bullet.trunkWorldMatrix = bullet.getWorldMatrix();
-                }
+                }*/
+
+                bullet.moveWithCollisions(new BABYLON.Vector3(direction.x * bullet.bulletSpeed * dt, direction.y * bullet.bulletSpeed * dt, direction.z * bullet.bulletSpeed * dt));
+                bullet.curShotDist += bullet.bulletSpeed * dt;
+
+                bullet.trunkWorldMatrix = bullet.getWorldMatrix();
 
                 if (Math.abs(bullet.position.x) > 2600 || Math.abs(bullet.position.y) > 3000 || Math.abs(bullet.position.z) > 4100) {
-                    console.log('bullet is went beyond range');
+                    // console.log('bullet is went beyond range');
                     bullet.active = false;
                     bullet.setEnabled(false);
                 }
@@ -442,15 +493,37 @@ Game.createBullet = function (ship, position, rotation, trunk, type, speed, powe
     bullet.active = true;
     bullet.setEnabled(true);
     // bullet.visibility = 0.1;
+    // bullet.checkCollisions = true;
+    bullet.onCollide = function (pickedMesh) {
+        // console.log(6666, pickedMesh);
+        if (pickedMesh.hasOwnProperty('shipId')) {
+            let ship = pickedMesh.parent;
+
+            if (ship.isHero && !bullet.parentShip.isHero) {
+                ship.onDemaged(bullet.parentShip.name, bullet.bulletPower);         // you got damage from someone
+                ship.hitFadeTimer = 1;
+            }
+            if (!ship.isHero && bullet.parentShip.isHero) {
+                bullet.parentShip.onHitOpponent(ship.name, bullet.bulletPower);     // you hit someone
+                ship.hitFadeTimer = 1;
+            }
+            // console.log(11, bullet)
+        }
+
+        bullet.active = false;
+        bullet.setEnabled(false);
+    };
 };
 Game.getBullet = function() {
     let i = 0;
     let len = Game.bulletStream.length;
+    let collideSize = 5;
 
     //pooling approach
     if (len === 0) {
         Game.bulletStream[0] = Game.bullet.clone('bullet');
 
+        Game.bulletStream[0].ellipsoid = new BABYLON.Vector3(collideSize, collideSize, collideSize);
         Game.bulletStream[0].material.alphaMode = BABYLON.Engine.ALPHA_ADD;
         // console.log(33)
     } else if (len > 700) {
@@ -462,6 +535,7 @@ Game.getBullet = function() {
             if (!Game.bulletStream[i]) {
                 Game.bulletStream[i] = Game.bullet.clone('bullet');
 
+                Game.bulletStream[i].ellipsoid = new BABYLON.Vector3(collideSize, collideSize, collideSize);
                 Game.bulletStream[i].material.alphaMode = BABYLON.Engine.ALPHA_ADD;
                 // console.log(11)
                 break;
@@ -531,7 +605,12 @@ Game.createShip = function (shipIdStr, position, rotation, params) {
     ship.isShooting = false;
     ship.startShootTime = 0;
     ship.isHero = isHero;
-    if (ship.isHero) ship.ellipsoid = new BABYLON.Vector3(72, 50, 52.5);
+    // if (ship.isHero) ship.ellipsoid = new BABYLON.Vector3(72, 50, 52.5);
+    if (ship.isHero) ship.ellipsoid = new BABYLON.Vector3(30, 30, 30);
+    // if (ship.isHero) ship.collisionFilter = 2;
+    // if (ship.isHero) ship.ellipsoidOffset = new BABYLON.Vector3(0, 5.9, 0);
+    if (ship.isHero) ship.isVisible = false;
+    // if (ship.isHero) ship.body.isVisible = false;
     ship.active = true;
     ship.setEnabled(true);
     ship.hitFadeTimer = 0;
@@ -539,13 +618,20 @@ Game.createShip = function (shipIdStr, position, rotation, params) {
 
     // ship.body = Game.scene.getMeshByName(ship.cloneId + '.ship01_body');
     ship.trunkLeft = Game.scene.getMeshByName(ship.cloneId + '.ship01_left_trunk');
+    ship.trunkLeft.isVisible = false;
     ship.trunkRight = Game.scene.getMeshByName(ship.cloneId + '.ship01_right_trunk');
+    ship.trunkRight.isVisible = false;
     ship.heroCollider = Game.scene.getMeshByName(ship.cloneId + '.ship01_collider');
     // ship.heroCollider.dispose();
     ship.heroCollider.shipId = ship.name;
-    ship.heroCollider.visibility = 0.0;
-    ship.heroCollider.checkCollisions = false;
-    ship.heroCollider.isPickable = true;
+    // ship.heroCollider.visibility = 0.0;
+    ship.heroCollider.isVisible = false;
+    ship.heroCollider.checkCollisions = true;
+    ship.heroCollider.isPickable = false;
+    // if (ship.isHero) ship.heroCollider.ellipsoid = new BABYLON.Vector3(140, 140, 140);
+    // Game.drawEllipsoid(ship);
+    // ship.heroCollider.collisionGroup = 2;
+    // ship.heroCollider.collisionMask = 1;
 
     ship.shipType = shipType;
     ship.speed = config.ships[ship.shipType].speed;
@@ -567,7 +653,7 @@ Game.createShip = function (shipIdStr, position, rotation, params) {
     ship.startBotTime = startBotPoint === undefined ? Rnd.integer(40000) : startBotPoint;
     if (ship.isBot) ship.heroDirection.z = ship.speed*0.25;
     if (ship.isBot) ship.isMoving = true;
-    if (ship.isBot) ship.isShooting = false;
+    if (ship.isBot) ship.isShooting = true;
 
     ship.onCollide = function (e) {
         // console.log(6666, e);
@@ -578,7 +664,7 @@ Game.createShip = function (shipIdStr, position, rotation, params) {
         }
     };
     ship.onDemaged = function (whoDemaged, demage) {
-        this.healthPoints -= demage;
+        // this.healthPoints -= demage;
 
         if (this.isHero) {
             console.log('----- ' + whoDemaged + ' нанёс вам урон ' + demage);
@@ -756,9 +842,11 @@ function vecToLocal(vector, mesh){
 //======================================================================================
 socket.on('room-get', function (state) {
     if (!state.ships) return;
-
+    console.log(222, state)
     for (let key in state.ships) {
+        console.log(11, socket.username, key)
         if (key !== socket.username) {
+            console.log(1122, key)
             Game.spawnNewPlayer(key, {
                 position: state.ships[key].pos,
                 rotation: state.ships[key].rot
@@ -811,7 +899,7 @@ socket.on('ship-respawn', function (data) {
     });
 });
 
-socket.on('leave', function (username) {
+socket.on('ship-leave', function (username) {
     if (!socket.isMyConnected) return;
     console.log('user disconnected --- ' + username);
     let ship = Game.scene.getMeshByName(username);
@@ -826,5 +914,6 @@ socket.on('leave', function (username) {
 });
 
 socket.on('disconnect', function () {
+    socket.close();
     socket.isMyConnected = false;
 });

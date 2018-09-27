@@ -1,4 +1,7 @@
 export const config = {
+    host: {
+        url: PRODUCTION ? 'https://arcane-lowlands-79462.herokuapp.com/' : 'http://localhost:5000'
+    },
     world: {
         fov: 1.5
     },

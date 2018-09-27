@@ -1,4 +1,6 @@
-import { Vector3 } from 'babylonjs';
+// import { Vector3 } from 'babylonjs';
+import BABYLON from '../BABYLON';
+const Vector3 = BABYLON.Vector3;
 // import { Curve } from '../core/Curve.js';
 
 /**

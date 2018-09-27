@@ -1,0 +1,179 @@
+@charset "utf-8";
+/*-------------FONTS--------------*/
+@import url('https://fonts.googleapis.com/css?family=PT+Sans:400,700');
+
+
+/*-------------COMMON-------------*/
+* {
+    margin: 0;
+    padding:  0;
+    outline: 0 !important;
+}
+
+a {
+
+}
+
+html, body {
+    background-color: #000;
+    min-width: 534px;
+    height: 100%;
+
+    font-family: 'PT Sans', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    color: #000;
+
+    overflow: hidden;
+    touch-action: none;
+    -ms-touch-action: none;
+}
+
+div {
+    display: block;
+    box-sizing: border-box;
+}
+
+span, p {
+    font-size: 14px;
+}
+
+
+/*---------------------------------*/
+body {
+    background-image: url(//piponga.com/site/bg_tile_gray.jpg);
+}
+
+/*-------------NAV--------------*/
+.nav {
+    position: absolute;
+    width: 100%;
+    padding: 4px 0;
+    font-size: 20px;
+    background: #f3f3f3;
+}
+    .nav a {
+        margin-left: 10px;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+.nav-left {
+    display: inline-block;
+}
+
+.nav-right {
+    display: inline-block;
+    float: right;
+}
+    .nav-name {
+        margin-right: 20px;
+    }
+
+/*---------------------------------*/
+.canvas-cont {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+}
+    #whiteboard {
+        position: absolute;
+        top: 30px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+    .canvas-ui-cont {
+        position: relative;
+        top: 50px;
+
+    }
+        .color {
+            width: 30px;
+            height: 30px;
+            position: relative;
+            display: inline-block;
+            margin: 0 2px;
+        }
+        .eraser-cont {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px;
+        }
+            .eraser-cont input {
+                margin-left: 20px;
+            }
+
+    .game-frame {
+        width: 100%;
+        height: 100%;
+    }
+
+
+/*---------------------------------*/
+.room {
+    position: absolute;
+    bottom: 0;
+    height: 200px;
+    width: 600px;
+    /*background: #f3f3f3;*/
+}
+
+.form {
+    position: absolute;
+    width: 550px;
+    bottom: 20px;
+    left: 20px;
+}
+.form input {
+    width: 100%;
+}
+
+.room ul {
+    position: absolute;
+    max-height: 146px;
+    left: 20px;
+    right: 0;
+    bottom: 46px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/*------------LOGIN-------------------*/
+.login-shade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #0000002e;
+}
+    .login-cont-table {
+        display: table;
+        width: 100%;
+        height: 100%;
+    }
+        .login-cont-cell {
+            display: table-cell;
+            height: 100%;
+            width: 100%;
+            vertical-align: middle;
+        }
+            .login-cont {
+                margin: 0 auto;
+                width: 600px;
+                height: max-content;
+                padding: 20px;
+                text-align: center;
+                background-color: #f3f3f3;
+            }
+
+.btn-guest-primary {
+    padding: 6px 12px;
+    background-color: #affd7e;
+    margin: 8px;
+}
